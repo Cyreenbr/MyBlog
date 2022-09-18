@@ -1,19 +1,142 @@
+{% set menus = menu_service.FindAll %}
+
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+         <meta charset="utf-8">
+         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>My Blog - {% block title %}{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
         {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
         {% block stylesheets %}
-            {{ encore_entry_link_tags('app') }}
+              {{ encore_entry_link_tags('app') }}
         {% endblock %}
 
         {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
+              {{ encore_entry_script_tags('app') }}
         {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+
+      <nav class="py-2 bg-dark border-bottom">
+       {% if is_granted('ROLE_AUTHOR') %}
+          <div class="container d-flex flex-wrap">
+          <div class="dropdown">
+             <a class="nav nav-link dropdown-toggle text-white" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              My Blog
+              </a>
+              <ul class="dropdown-menu">
+               <li><a class="dropdown-item" href="{{ path('admin')}}" >Dashboard</a></li>
+               {% if is_granted('ROLE_ADMIN') %}
+               <li><a class="dropdown-item" href="#">Menus</a></li>
+               {% endif %}
+              </ul>
+           </div>
+           <div class="dropdown">
+             <a class="nav nav-link dropdown-toggle text-white" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Add
+              </a>
+              <ul class="dropdown-menu">
+               <li><a class="dropdown-item" href="#">Article</a></li>
+               <li><a class="dropdown-item" href="#">Page</a></li>
+              </ul>
+           </div>
+          </div>
+          {% else %}
+           <div class="container d-flex flex-wrap">
+              <h3 class="text-white" >  My Blog </h3>
+           </div>
+          {% endif %}
+      </nav>
+
+
+       <div class="container">
+         <ul class="nav nav-pills">
+           {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+            
+            <div class="dropdown">
+                            <a class="nav-link  px-2 dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                {{ app.user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('app_profile',  { 'username': app.user.username }) }}">My profile</a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('app_logout') }}">Logout</a>
+                                </li>
+                            </ul>
+              </div>
+           {% endif %}
+           {% for menu in menus %}
+              {% if menu.subMenu.count > 0 %}
+                  <div class="dropdown">
+                     <a class="nav nav-link dropdown-toggle " type="button" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                       {{menu.name}}
+                    </a>
+                   <ul class="dropdown-menu">
+                   {% for subMenu in menu.subMenu %}
+                      <li>
+                        <a class="dropdown-item" href="#" >{{subMenu.name}}</a>
+                      </li>
+                   {% endfor %}
+                   </ul>
+                  </div>
+              {% else %}
+                  <li class="nav-item">
+                     <a class="nav-link text-dark" href="#">
+                     {{menu.name}}
+                     </a>
+                  </li>
+              {% endif %}
+           {% endfor %}
+      
+         </ul>
+       </div>
+      <div class="container ">
+     
+        <header class=" border-bottom mb-4 pb-4 ">
+        <div class="px-4 py-5 my-5 text-center " >
+            <img class="d-block mx-auto mb-4" src="../uploads/blog_logo.svg.png" width="100" height="80" >
+           <h1> My blog </h1>
+           <div class="col-lg-6 mx-auto" >
+               <p class="lead mb-4">where you explain yourself</p>
+               <div class="d-grid gap-2  d-sm-flex justify-content-sm-center ">             
+        {% if not is_granted('IS_AUTHENTICATED_FULLY') %}  
+              <button type="button" class="btn btn-primary btn-lg px-4 gap-3">
+              <a class="text-decoration-none text-light" href="{{ path('app_register')}}">
+                Register
+              </a>
+              </button>
+              <button type="button" class="btn btn-outline-secondary btn-lg px-4 gap-3">
+                <a class="text-decoration-none link-light text-dark" href="{{ path('app_login')}}">
+                   Sign In
+                </a>
+              </button>
+        {% endif %}
+              </div>
+           </div>
+        </div>
+        </header>
+       
+
+                     {% block body %}{% endblock %}
+
+       <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+            <div class="col-md-4 d-flex align-items-center">
+              <a href="#" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
+                  <img class="d-block mx-auto mb-4" src="../uploads/blog_logo.svg.png" width="40" height="35" >
+              </a>
+              <span class="mb-3 mb-md-0 text-muted">©{{'now'|date('Y')}} My Blog</span>
+            </div>
+
+           <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+               <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#twitter"></use></svg></a></li>
+               <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#instagram"></use></svg></a></li>
+               <li class="ms-3"><a class="text-muted" href="#"><svg class="bi" width="24" height="24"><use xlink:href="#facebook"></use></svg></a></li>
+           </ul>
+        </footer>
+      </div>
+
     </body>
 </html>

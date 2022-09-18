@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block body %}
+  <main class="container">
+        <div class="row g-5">
+            <div class="col-xl-8">
+               <h3 class="mb-4 pb-4 border-bottom fst-italic">Recents articles</h3>
+               <div id="articles-list">
+                 {% include 'article/list.html.twig' with {articles} %}
+               </div>
+            </div>
+            <div class="col-xl-4">
+                <div class="position-sticky" style="top: 2rem;" >
+                  {% include('widgets/about.html.twig') %}
+                  {% include('widgets/categories.html.twig') %}
+
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}
